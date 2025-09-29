@@ -1,6 +1,14 @@
+import { UserModel } from "../models/mongoose/user.model.js";
+import { singToken, verifyToken} from "../helpers/jwt.helper.js" ;
+import { hashPassword, comparePassword } from "../helpers/bcrypt.helper.js";
+
 export const register = async (req, res) => {
-  try {
-    // TODO: crear usuario con password hasheada y profile embebido
+    const { username, email, password, role, profile } = req.body;
+    try {
+        const hashedPwd = await hashPassword(password);
+        const newUser = new UserModel({ username, email, password: hashedPwd, role, profile });
+        await newUser.save();
+        res.status(201).json(newUser);
     return res.status(201).json({ msg: "Usuario registrado correctamente" });
   } catch (error) {
     console.log(error);
@@ -9,8 +17,18 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  const { email, password } = req.body;
   try {
-    // TODO: buscar user, validar password, firmar JWT y setear cookie httpOnly
+     const user = await UserModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        const isPasswordValid = await comparePassword(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Contraseña incorrecta" });
+        }
+        const token = singToken({ id: user._id, role: user.role });
+        res.status(200).json({ token });
     return res.status(200).json({ msg: "Usuario logueado correctamente" });
   } catch (error) {
     console.log(error);
@@ -19,8 +37,9 @@ export const login = async (req, res) => {
 };
 
 export const getProfile = async (req, res) => {
+  const { id } = req.params;
   try {
-    // TODO: devolver profile del user logueado actualmente
+    const user = await UserModel.findById(id);
     return res.status(200).json({ data: profile });
   } catch (error) {
     console.log(error);

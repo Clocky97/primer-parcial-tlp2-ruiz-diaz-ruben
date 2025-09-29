@@ -1,6 +1,6 @@
 export const getAllUsers = async (_req, res) => {
   try {
-    // TODO: devolver usuarios con profile y sus assets con sus categories (populate) (solo admin)
+   const users = await UserModel.find().populate('owner', 'username email');
     return res.status(200).json({ data: users });
   } catch (error) {
     console.log(error);
@@ -8,9 +8,12 @@ export const getAllUsers = async (_req, res) => {
   }
 };
 
+//soft delete
+
 export const deleteUser = async (req, res) => {
-  try {
-    // TODO: eliminación lógica (deletedAt) (solo admin)
+    const { id } = req.params;
+    try {
+        await UserModel.findByIdAndUpdate(id, { deleted: true });
     return res.status(204).json({ msg: "Usuario eliminado correctamente" });
   } catch (error) {
     console.log(error);
