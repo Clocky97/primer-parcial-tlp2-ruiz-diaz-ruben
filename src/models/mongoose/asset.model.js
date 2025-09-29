@@ -1,7 +1,5 @@
 import { Schema, model } from "mongoose";
 
-// TODO: completar relaciones embebidas y referenciadas
-
 const AssetSchema = new Schema(
   {
     inventoryNumber: { type: String, required: true, unique: true },
@@ -20,7 +18,8 @@ const AssetSchema = new Schema(
     },
     acquisitionDate: { type: Date, required: true },
     acquisitionValue: { type: Number, required: true, min: 0 },
-    // ! FALTA COMPLETAR ACA
+    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true},
+    deleted: { type: Boolean, default: false}
   },
   { timestamps: true }
 );

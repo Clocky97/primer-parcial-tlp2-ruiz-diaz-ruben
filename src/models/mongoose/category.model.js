@@ -1,7 +1,5 @@
 import { Schema, model } from "mongoose";
 
-// TODO: configurar el virtuals para el populate inverso con assets
-
 const CategorySchema = new Schema(
   {
     name: {
@@ -12,10 +10,11 @@ const CategorySchema = new Schema(
       maxlength: 100,
     },
     description: { type: String, maxlength: 500 },
+    deleted: { type: Boolean, default: false}
   },
   { timestamps: true }
 );
 
-// ! FALTA COMPLETAR ACA
+
 
 export const CategoryModel = model("Category", CategorySchema);

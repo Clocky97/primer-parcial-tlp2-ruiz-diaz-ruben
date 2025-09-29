@@ -1,6 +1,12 @@
+import { UserModel } from "../models/mongoose/user.model.js";
+import UserModel from "../models/sequelize/user.model.js"
+
 export const createAsset = async (req, res) => {
-      try {
-    // TODO: crear asset (usuario autenticado)
+    const { username, email, password, role, profile } = req.body;
+    try {
+        const newUser = new UserModel({ username, email, password, role, profile });
+        await newUser.save();
+        res.status(201).json(newUser);
     return res.status(201).json({ msg: "Asset creado correctamente" });
   } catch (error) {
     console.log(error);

@@ -1,6 +1,5 @@
 import { model, Schema } from "mongoose";
-
-// TODO: completar relacion embebida y configurar el virtuals para el populate inverso con assets
+import { AssetModel } from "./asset.model";
 
 const UserSchema = new Schema(
   {
@@ -18,12 +17,27 @@ const UserSchema = new Schema(
       enum: ["secretary", "administrator"],
       default: "secretary",
     },
-    deletedAt: { type: Date, default: null },
-    // ! FALTA COMPLETAR ACA
+    profile: {
+      employee_number: { type: String, unique: true, required: true},
+      firstname: { type: String, unique: true, required: true, minLength: 2, maxLength: 50},
+      lastname: { type: String, unique: true, required: true, minLength: 2, maxLength: 50},
+      phone: {type: String, required: false}
+    },
+    deleted: { type: Boolean, default: false},
+    deletedAt: { type: Date, default: null }
   },
   { timestamps: true }
 );
 
-// ! FALTA COMPLETAR ACA
+//cascada
+
+UserSchema.pre(
+    'findByIdAndUpdate', async function (next) {
+        const user = await this.model.findOne(this.getFilter());
+    if (user) {
+        await AssetModel.updateMany({ owner: user._id},{ deleted: true });
+        }
+        next();
+    });
 
 export const UserModel = model("User", UserSchema);
